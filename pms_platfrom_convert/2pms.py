@@ -12,7 +12,7 @@ def _argparse():
     parser=argparse.ArgumentParser(description='script for convert cvs ,import to pms')
     parser.add_argument('-f',action='store',dest='filename',help='csv filename import')
     parser.add_argument('-P', dest='P_ID', help='Product ID',type=int)
-    parser.add_argument('-p',dest='p_ID',help='platfrom ID',type=int)
+    parser.add_argument('-p',dest='p_ID',help='platfrom ID')
     return parser.parse_args()
 
 def platform_check(pID):
