@@ -11,7 +11,8 @@ temp={}
 def _argparse():
     parser=argparse.ArgumentParser(description='script for convert cvs ,import to pms')
     parser.add_argument('-f',action='store',dest='filename',help='csv filename import')
-    parser.add_argument('-p',action='store',dest='pID',help='platfrom ID')
+    parser.add_argument('-P', dest='P_ID', help='Product ID',type=int)
+    parser.add_argument('-p',dest='p_ID',help='platfrom ID',type=int)
     return parser.parse_args()
 
 def platform_check(pID):
@@ -56,19 +57,49 @@ def convert(filename,pID):
     writer.writerow(res[0])
     for list in res[1:]: 
         list[0]=0
-        splat=list[2]
         list[2]=pID
         list[3]=moudle_check(pID.split('(')[0],list[3])
         if list[11].strip() == '':
             list[11] = '3'
         writer.writerow(list)
 
+def moudle_convert(mstr):
+    moudle=''
+    str=mstr.split('(')[0]
+    if temp.has_key(str):
+        moudle=str+'(#'+temp.get(str)+')'
+    else :
+       sys.stdout.write("%s on pms.deepin.cn is not exist\n"%str)
+    return moudle
+
+def Product_convert(filename, P_ID) :
+    destfile=str(P_ID)+filename
+    reader=csv.reader(open(filename,'rb'))
+    open(destfile,'w+').truncate()
+    writer=csv.writer(open(destfile,'a+'))
+    res=[]
+    for list in reader:
+        res.append(list)
+    writer.writerow(res[0])
+    for list in res[1:]:
+        list[0]=0
+        list[1]='(#'+str(P_ID)+')'
+        list[2]=moudle_convert(list[2])
+        if list[11].strip() == '':
+            list[11] = '3'
+        writer.writerow(list)
+
+
 def main():
     parser=_argparse()
-    pID=platform_check(parser.pID)
-    templete()
-    if len(pID) > 0: 
-        convert(parser.filename,pID)
+    if parser.p_ID :
+        pID=platform_check(parser.p_ID)
+        templete()
+        if len(pID) > 0:
+            convert(parser.filename,pID)
+    if parser.P_ID :
+        templete()
+        Product_convert(parser.filename,parser.P_ID)
 
 if __name__=='__main__':
     main()
